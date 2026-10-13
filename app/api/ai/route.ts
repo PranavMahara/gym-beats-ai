@@ -15,6 +15,9 @@ const requestSchema = z.object({
     artists: z.string().trim().max(100).optional(),
 });
 
+// Gemini can take ~10s+; the Vercel default of 10s would kill the request.
+export const maxDuration = 60;
+
 const MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
 
 async function generateWithGemini(prompt: string, count: number) {
@@ -39,7 +42,7 @@ async function generateWithGemini(prompt: string, count: number) {
             },
             maxOutputTokens: 8192,
         },
-    });
+    }, { timeout: 45000 });
 
     const result = await model.generateContent(prompt);
     const raw: unknown = JSON.parse(result.response.text());

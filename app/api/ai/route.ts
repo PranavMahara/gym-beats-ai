@@ -15,7 +15,7 @@ const requestSchema = z.object({
     artists: z.string().trim().max(100).optional(),
 });
 
-const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
 
 async function generateWithGemini(prompt: string, count: number) {
     if (!process.env.GOOGLE_AI_API) {
@@ -37,7 +37,7 @@ async function generateWithGemini(prompt: string, count: number) {
                     required: ["song", "artist"],
                 },
             },
-            maxOutputTokens: 2048,
+            maxOutputTokens: 8192,
         },
     });
 

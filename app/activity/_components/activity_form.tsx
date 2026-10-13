@@ -57,7 +57,8 @@ const ActivityForm = () => {
     const [selectedForm, setSelectedForm] = useState("Activity");
     const [result, setResult] = useState<{ song: string; artist: string }[]>([]);
     const [saved, setSaved] = useState(false);
-    const [fromLibrary, setFromLibrary] = useState(false);
+    const [fromLibrary, setFromLibrary] = useState<null | "limit" | "unavailable">(null);
+    const [copied, setCopied] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -66,7 +67,7 @@ const ActivityForm = () => {
         defaultValues: {
             activityType: "",
             duration: "30",
-            intensity: "",
+            intensity: "medium",
             languageOfMusic: "English",
             favouriteGenres: "",
             favouriteArtists: "",
@@ -95,7 +96,7 @@ const ActivityForm = () => {
             });
             setResult(data.songs);
             setSaved(Boolean(data.saved));
-            setFromLibrary(data.source === "fallback");
+            setFromLibrary(data.source === "fallback" ? (data.reason === "limit" ? "limit" : "unavailable") : null);
         } catch (err) {
             setResult([]);
             setError(axios.isAxiosError(err) && err.response?.data?.error
@@ -285,7 +286,10 @@ const ActivityForm = () => {
                                         <>
                                             {fromLibrary && (
                                                 <p className="md:px-8 mt-2 text-sm text-yellow-400">
-                                                    AI suggestions are unavailable right now, so this playlist comes from our built-in library (English songs, matched to your genres and intensity).
+                                                    {fromLibrary === "limit"
+                                                        ? "You've used your AI playlists for now (the limit resets hourly), so this one comes from our built-in library."
+                                                        : "AI suggestions are unavailable right now, so this playlist comes from our built-in library."}
+                                                    {" "}It has English songs matched to your genres and intensity.
                                                 </p>
                                             )}
                                             <p className="md:px-8 mt-2 text-sm text-gray-400">
@@ -306,6 +310,20 @@ const ActivityForm = () => {
                                         <Button onClick={() => setSelectedForm("Music")}>
                                             Back to Music
                                         </Button>
+                                        <Button onClick={form.handleSubmit(onSubmit, onInvalid)} disabled={loading}>
+                                            New playlist
+                                        </Button>
+                                        {result.length > 0 && (
+                                            <Button
+                                                onClick={async () => {
+                                                    await navigator.clipboard.writeText(result.map((r, i) => `${i + 1}. ${r.song} - ${r.artist}`).join("\n"));
+                                                    setCopied(true);
+                                                    setTimeout(() => setCopied(false), 2000);
+                                                }}
+                                            >
+                                                {copied ? "Copied!" : "Copy list"}
+                                            </Button>
+                                        )}
                                     </div>
                                 </div>
                             )}

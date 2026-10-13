@@ -13,7 +13,7 @@ const LaunchingSoon = () => {
         <div className='relative py-20'>
             <WavyBackground>
                 <div className={`flex justify-center items-center h-full my-24 py-4 text-5xl sm:text-7xl lg:text-8xl ${scp_font.className}`}>
-                    Coming Soon!
+                    Press play on your workout.
                 </div>
             </WavyBackground>
 

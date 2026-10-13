@@ -27,3 +27,10 @@ model Recommendation {
 
   userId String
 }
+
+// Counters for rate limiting API calls. One document per key per time window.
+model RateLimit {
+  id        String   @id @map("_id")
+  count     Int
+  expiresAt DateTime
+}

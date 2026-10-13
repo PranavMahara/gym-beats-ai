@@ -19,7 +19,7 @@ const requestSchema = z.object({
 export const maxDuration = 60;
 
 // Tried in order. Newer models are sometimes overloaded, so each gets a short timeout.
-const MODELS = [process.env.GEMINI_MODEL, "gemini-3.8-flash", "gemini-3.7-flash"].filter(
+const MODELS = [process.env.GEMINI_MODEL, "gemini-3.1-flash-lite", "gemini-3.8-flash", "gemini-3.7-flash"].filter(
     (m, i, all): m is string => !!m && all.indexOf(m) === i
 );
 const ATTEMPT_TIMEOUT_MS = 20000;

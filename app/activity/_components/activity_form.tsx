@@ -57,6 +57,7 @@ const ActivityForm = () => {
     const [selectedForm, setSelectedForm] = useState("Activity");
     const [result, setResult] = useState<{ song: string; artist: string }[]>([]);
     const [saved, setSaved] = useState(false);
+    const [fromLibrary, setFromLibrary] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -94,6 +95,7 @@ const ActivityForm = () => {
             });
             setResult(data.songs);
             setSaved(Boolean(data.saved));
+            setFromLibrary(data.source === "fallback");
         } catch (err) {
             setResult([]);
             setError(axios.isAxiosError(err) && err.response?.data?.error
@@ -281,6 +283,11 @@ const ActivityForm = () => {
 
                                     {result.length > 0 && (
                                         <>
+                                            {fromLibrary && (
+                                                <p className="md:px-8 mt-2 text-sm text-yellow-400">
+                                                    AI suggestions are unavailable right now, so this playlist comes from our built-in library (English songs, matched to your genres and intensity).
+                                                </p>
+                                            )}
                                             <p className="md:px-8 mt-2 text-sm text-gray-400">
                                                 {saved
                                                     ? <>Saved to <Link href="/recommendations" className="underline">your recommendations</Link>. Click a card to find it on Spotify.</>

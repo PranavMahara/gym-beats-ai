@@ -18,15 +18,32 @@ const requestSchema = z.object({
 // Gemini can take ~10s+; the Vercel default of 10s would kill the request.
 export const maxDuration = 60;
 
-const MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+// Tried in order. Newer models are sometimes overloaded, so each gets a short timeout.
+const MODELS = [process.env.GEMINI_MODEL, "gemini-3.8-flash", "gemini-3.7-flash"].filter(
+    (m, i, all): m is string => !!m && all.indexOf(m) === i
+);
+const ATTEMPT_TIMEOUT_MS = 20000;
 
 async function generateWithGemini(prompt: string, count: number) {
+    let lastError: unknown;
+    for (const model of MODELS) {
+        try {
+            return await generateWithModel(model, prompt, count);
+        } catch (error) {
+            lastError = error;
+            console.error(`Gemini model ${model} failed:`, error);
+        }
+    }
+    throw lastError;
+}
+
+async function generateWithModel(modelName: string, prompt: string, count: number) {
     if (!process.env.GOOGLE_AI_API) {
         throw new Error("GOOGLE_AI_API is not set");
     }
 
     const model = new GoogleGenerativeAI(process.env.GOOGLE_AI_API).getGenerativeModel({
-        model: MODEL,
+        model: modelName,
         generationConfig: {
             responseMimeType: "application/json",
             responseSchema: {
@@ -42,7 +59,7 @@ async function generateWithGemini(prompt: string, count: number) {
             },
             maxOutputTokens: 8192,
         },
-    }, { timeout: 45000 });
+    }, { timeout: ATTEMPT_TIMEOUT_MS });
 
     const result = await model.generateContent(prompt);
     const raw: unknown = JSON.parse(result.response.text());

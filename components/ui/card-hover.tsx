@@ -2,7 +2,8 @@
 
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { ThumbsDownIcon, ThumbsUpIcon } from "lucide-react";
+import { ExternalLink } from "lucide-react";
+import { spotifySearchUrl } from "@/lib/activities";
 import { useState } from "react";
 import { Caveat } from "next/font/google";
 
@@ -25,7 +26,6 @@ export const HoverEffect = ({
     items: {
         song: string;
         artist: string;
-        liked?: boolean;
     }[];
     className?: string;
 }) => {
@@ -39,8 +39,11 @@ export const HoverEffect = ({
             )}
         >
             {items.map((item, idx) => (
-                <div
-                    key={item?.song}
+                <a
+                    key={`${item.song}-${item.artist}`}
+                    href={spotifySearchUrl(item.song, item.artist)}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="relative group p-2 w-full sm:w-[300px] h-[200px] md:h-[300px]"
                     onMouseEnter={() => setHoveredIndex(idx)}
                     onMouseLeave={() => setHoveredIndex(null)}
@@ -66,11 +69,11 @@ export const HoverEffect = ({
                         <CardTitle className={`h-[160px] border-b-2 w-full border-gray-500 border-opacity-15 ${scp_font.className} text-2xl`}>{item.song}</CardTitle>
                         <div className="flex items-center space-x-2 h-[10%] justify-between">
                             <CardDescription className="flex justify-center items-center text-[16px]"><div className={`${caveat_text.className} mr-2`}>BY</div> {item.artist}</CardDescription>
-                            {item.liked ? <div className="flex justify-center items-center mt-16"><ThumbsDownIcon /></div> : <div className="flex justify-center items-center mt-6"><ThumbsUpIcon /></div>}
+                            <div className="flex justify-center items-center mt-6" title="Find on Spotify"><ExternalLink /></div>
 
                         </div>
                     </Card>
-                </div>
+                </a>
             ))}
         </div>
     );

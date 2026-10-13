@@ -4,6 +4,7 @@ import React from "react";
 import { BentoGrid2 } from "@/components/ui/bento-grid-2";
 import { MovingBorder } from "@/components/ui/moving-border";
 import { Source_Code_Pro } from "next/font/google";
+import { EmptyState } from "@/components/login-prompt";
 
 const scp_font = Source_Code_Pro({
   weight: "800",
@@ -13,24 +14,13 @@ const scp_font = Source_Code_Pro({
 const Recommendations = ({
   recommendations,
 }: {
-  recommendations:
-    | "No activity types found."
-    | {
-        activityType: string;
-        songs: ({ name: string; artist: string } | null)[];
-      }[]
-    | null;
+  recommendations: {
+    activityType: string;
+    songs: { name: string; artist: string }[];
+  }[];
 }) => {
-  if (
-    !recommendations ||
-    recommendations === "No activity types found." ||
-    recommendations.length === 0
-  ) {
-    return (
-      <div className={`text-center py-12 text-3xl ${scp_font.className}`}>
-        No recommendations available.
-      </div>
-    );
+  if (recommendations.length === 0) {
+    return <EmptyState />;
   }
 
   return (
@@ -40,8 +30,7 @@ const Recommendations = ({
       </div>
       <div>
         <div className="flex flex-col gap-8">
-          {Array.isArray(recommendations) &&
-            recommendations.map((rec, i) => (
+          {recommendations.map((rec, i) => (
               <div
                 key={i}
                 className="p-4 bg-[#121212] border-white border border-opacity-15 rounded-lg shadow-md relative"
